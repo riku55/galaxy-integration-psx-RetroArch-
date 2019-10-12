@@ -39,7 +39,7 @@ class RetroarchPSXPlugin(Plugin):
     def update_game_cache(self):   
         game_list = []
     
-         if os.path.isfile(self.playlist_path):
+        if os.path.isfile(self.playlist_path):
             with open(self.playlist_path) as playlist_json:
                 playlist_dict = json.load(playlist_json)
             for entry in playlist_dict["items"]:
@@ -48,8 +48,8 @@ class RetroarchPSXPlugin(Plugin):
                         correct_name = corrections.correction_list[entry["label"].split(" (")[0]]
                     else:
                         correct_name = entry["label"].split(" (")[0]
-                    if "disc" in entry["label"] and entry["label"] not in corrections.correction_list:
-                        if "disc 1" in entry["label"]:
+                    if "Disc" in entry["label"] and entry["label"] not in corrections.correction_list:
+                        if "Disc 1" in entry["label"]:
                             pass
                         else:
                             continue
@@ -60,7 +60,7 @@ class RetroarchPSXPlugin(Plugin):
                             None,
                             LicenseInfo(LicenseType.SinglePurchase, None)
                             )
-                        )     
+                        )    
                         
         for entry in game_list:
             if entry not in self.game_cache:
@@ -102,6 +102,7 @@ class RetroarchPSXPlugin(Plugin):
         for entry in playlist_dict["items"]:
             if game_id == entry["label"]:
                 self.update_local_game_status(LocalGame(game_id, 2))
+                self.game_run = entry["label"]
                 if user_config.core == 1:
                     self.proc = subprocess.Popen(os.path.abspath(user_config.emu_path + "retroarch.exe" + " -L \"" + user_config.emu_path + "cores/pcsx_rearmed_libretro.dll\" \"" + entry["path"]))
                 if user_config.core == 2:
