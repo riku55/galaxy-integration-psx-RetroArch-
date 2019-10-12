@@ -1,0 +1,11 @@
+{
+    "name": "Galaxy PSX RetroArch plugin",
+    "platform": "psx",
+    "guid": "fa880426-1722-497e-bf19-1b1d200bd51b",
+    "version": "0.2",
+    "description": "Galaxy Plugin to add psx roms and start them with RetroArch emulator",
+    "author": "riku55",
+    "email": "",
+    "url": "https://github.com/Riku55",
+    "script": "plugin.py"
+}
