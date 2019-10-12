@@ -39,15 +39,20 @@ class RetroarchPSXPlugin(Plugin):
     def update_game_cache(self):   
         game_list = []
     
-        if os.path.isfile(self.playlist_path):
+         if os.path.isfile(self.playlist_path):
             with open(self.playlist_path) as playlist_json:
                 playlist_dict = json.load(playlist_json)
             for entry in playlist_dict["items"]:
                 if os.path.abspath(user_config.rom_path) in os.path.abspath(entry["path"]) and os.path.isfile(entry["path"]):
-                    if entry["label"].split(" (")[0] in corrections.correction_list:
+                    if entry["label"] in corrections.correction_list:
                         correct_name = corrections.correction_list[entry["label"].split(" (")[0]]
                     else:
                         correct_name = entry["label"].split(" (")[0]
+                    if "disc" in entry["label"] and entry["label"] not in corrections.correction_list:
+                        if "disc 1" in entry["label"]:
+                            pass
+                        else:
+                            continue
                     game_list.append(
                         Game(                          
                             entry["label"],
@@ -55,7 +60,7 @@ class RetroarchPSXPlugin(Plugin):
                             None,
                             LicenseInfo(LicenseType.SinglePurchase, None)
                             )
-                        )    
+                        )     
                         
         for entry in game_list:
             if entry not in self.game_cache:
