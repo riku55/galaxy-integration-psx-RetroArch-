@@ -21,7 +21,7 @@ Thanks to AHCoder for using his PS2 integration as base for this one. Also thank
 4. Navigate to *Settings*, click on *Saving*, go to the last option there *Save runtime log (aggregate)* and turn it on.
 
 ### Setting up the Integration:
-1. Download the integration (use clone or download or download the *Source Code.zip* file in releases or just [click here](https://github.com/Riku55/galaxy-integration-n64-RetroArch-/archive/0.2.zip)).
+1. Download the integration (use clone or download or download the *Source Code.zip* file in releases or just [click here](https://github.com/Riku55/galaxy-integration-psx-RetroArch-/archive/master.zip)).
 2. Extract the ZIP file.
 3. Put it into your Galaxy plugin folder (standard is: *C:\Users\USERNAME\AppData\Local\GOG.com\Galaxy\plugins\installed*)
 4. Open the file *user_config.py* with an editor.
