@@ -1,7 +1,7 @@
 # galaxy-integration-psx-RetroArch-
 PSX RetroArch integration for GOG Galaxy 2.0
 
-# [If you want the integration to work, please read the tutorial!](https://github.com/Riku55/galaxy-integration-psx-RetroArch-#tutorial)
+# [This integration is not yet working as intended. Don't use it!](https://github.com/Riku55/galaxy-integration-psx-RetroArch-#tutorial)
 
 This integration is still work in progress, but it's core features are working and the worst bugs are removed, so try it out if you'd like to.
 Thanks to AHCoder for using his PS2 integration as base for this one. Also thanks to several people on the GOG Discord for helping me out with some problems.
