@@ -16,6 +16,8 @@ class RetroarchPSXPlugin(Plugin):
         self.playlist_path = user_config.emu_path + "playlists/Sony - Playstation.lpl"
         self.proc = None
         self.game_run = ""
+        with open(os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/PS1_archive.json"), errors= "ignore") as serials_json:
+            self.serials = json.load(serials_json)
 
    
     async def authenticate(self, stored_credentials=None):
@@ -38,24 +40,36 @@ class RetroarchPSXPlugin(Plugin):
     #Scans retroarch playlist for roms in rom_path and adds them to self.game_cache
     def update_game_cache(self):   
         game_list = []
+        region = ""
+        serial = ""
     
         if os.path.isfile(self.playlist_path):
             with open(self.playlist_path) as playlist_json:
                 playlist_dict = json.load(playlist_json)
-            for entry in playlist_dict["items"]:
+            for entry in playlist_dict["items"]:                
                 if os.path.abspath(user_config.rom_path) in os.path.abspath(entry["path"]) and os.path.isfile(entry["path"]):
+                    if "(Europe)" in entry["label"]:
+                        region = "PAL"
+                    if "(USA)" in entry["label"]:
+                        region = "NTSC-U"
+                    if "(Japan)" in entry["label"]:
+                        region = "NTSC-J"
                     if entry["label"] in corrections.correction_list:
                         correct_name = corrections.correction_list[entry["label"].split(" (")[0]]
                     else:
                         correct_name = entry["label"].split(" (")[0]
+                    for s_entry in self.serials:
+                        if entry["label"].split(" (")[0].upper() == s_entry["NAME"].split(" - [")[0] and region == s_entry["REGION"]:                        
+                            serial = s_entry["SERIAL"].replace("-","")
                     if "Disc" in entry["label"] and entry["label"] not in corrections.correction_list:
                         if "Disc 1" in entry["label"]:
                             pass
                         else:
                             continue
+                    
                     game_list.append(
                         Game(                          
-                            entry["label"],
+                            serial,
                             correct_name,
                             None,
                             LicenseInfo(LicenseType.SinglePurchase, None)
@@ -117,12 +131,17 @@ class RetroarchPSXPlugin(Plugin):
         file_path = ""
         time = 0
         last_played = None
+        game_label = ""
+        
+        for s_entry in self.serials:
+            if game_id == s_entry["SERIAL"].replace("-",""):
+               game_label = s_entry["NAME"]
 
         if os.path.isfile(self.playlist_path):
             with open(self.playlist_path) as playlist_json:
                 playlist_dict = json.load(playlist_json)
             for rom in playlist_dict["items"]:
-                if game_id == rom["label"]:
+                if game_label.split("  -  [")[0] == rom["label"].upper().split(" (")[0]:
                     file_path = user_config.emu_path + "/playlists/logs/" + os.path.abspath(rom["path"]).split(os.path.abspath(user_config.rom_path) + "\\")[1][:-4] + ".lrtl"       
                     if os.path.isfile(file_path):
                         with open(file_path) as json_data:
