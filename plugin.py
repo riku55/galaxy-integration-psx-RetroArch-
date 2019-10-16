@@ -16,17 +16,21 @@ class RetroarchPSXPlugin(Plugin):
         self.playlist_path = user_config.emu_path + "playlists/Sony - Playstation.lpl"
         self.proc = None
         self.game_run = ""
-        with open(os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/PS1_archive.json"), errors= "ignore") as serials_json:
-            self.serials = json.load(serials_json)
+        self.serials=""
+        self.booted = False
+        
 
    
     async def authenticate(self, stored_credentials=None):
+        
         creds = {}
         creds["user"] = "RAUser"
         self.store_credentials(creds)
+        
         return Authentication("RAUser", "Retroarch")
     
     async def pass_login_credentials(self, step, credentials, cookies):
+        
         creds = {}
         creds["user"] = "RAUser"
         self.store_credentials(creds)
@@ -38,10 +42,14 @@ class RetroarchPSXPlugin(Plugin):
         return self.game_cache  
     
     #Scans retroarch playlist for roms in rom_path and adds them to self.game_cache
-    def update_game_cache(self):   
+    def update_game_cache(self):
+        
         game_list = []
         region = ""
         serial = ""
+        archive_name = ""
+        with open(os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/PS1_archive.json"), encoding="latin-1") as serials_json:
+            self.serials = json.load(serials_json)
     
         if os.path.isfile(self.playlist_path):
             with open(self.playlist_path) as playlist_json:
@@ -54,12 +62,14 @@ class RetroarchPSXPlugin(Plugin):
                         region = "NTSC-U"
                     if "(Japan)" in entry["label"]:
                         region = "NTSC-J"
-                    if entry["label"] in corrections.correction_list:
-                        correct_name = corrections.correction_list[entry["label"].split(" (")[0]]
+                    if entry["label"].split(" (")[0] in corrections.correction_list:
+                        correct_name = corrections.correction_list[entry["label"].split(" (")[0]]["Correct_Label"]
+                        archive_name = corrections.correction_list[entry["label"].split(" (")[0]]["Archive_Label"]
                     else:
                         correct_name = entry["label"].split(" (")[0]
                     for s_entry in self.serials:
-                        if entry["label"].split(" (")[0].upper() == s_entry["NAME"].split(" - [")[0] and region == s_entry["REGION"]:                        
+                        if  (entry["label"].split(" (")[0].upper() == s_entry["NAME"].split(" - [")[0] or \
+                            archive_name == s_entry["NAME"].split(" - [")[0])  and region == s_entry["REGION"]:                        
                             serial = s_entry["SERIAL"].replace("-","")
                     if "Disc" in entry["label"] and entry["label"] not in corrections.correction_list:
                         if "Disc 1" in entry["label"]:
@@ -75,6 +85,7 @@ class RetroarchPSXPlugin(Plugin):
                             LicenseInfo(LicenseType.SinglePurchase, None)
                             )
                         )    
+                    archive_name = ""    
                         
         for entry in game_list:
             if entry not in self.game_cache:
@@ -85,6 +96,8 @@ class RetroarchPSXPlugin(Plugin):
             if entry not in game_list:
                 self.game_cache.remove(entry)    
                 self.remove_game(entry.game_id)
+                
+        self.booted = True
 
                     
     #runs update_game_cache in case it is started before get_owned_games. If it runs after it, it just returns self.game_cache with each game as installed
@@ -159,9 +172,10 @@ class RetroarchPSXPlugin(Plugin):
                 self.proc = None
         except AttributeError:
             pass
-            
-        self.update_game_cache()    
-        self.get_local_games()
+        
+        if self.booted:    
+            self.update_game_cache()    
+            self.get_local_games()
         
 
 def main():
